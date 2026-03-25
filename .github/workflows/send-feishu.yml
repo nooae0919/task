@@ -1,22 +1,62 @@
-name: 定时发送飞书消息
+name: 上班打卡提醒
 
 on:
   schedule:
-    - cron: '0 1 * * *'  # 每天北京时间9点
-  workflow_dispatch:      # 支持手动触发
+    - cron: '25 0 * * *'  # 每天北京时间 8:25（UTC 0:25）
+  workflow_dispatch:
 
 jobs:
   send:
     runs-on: ubuntu-latest
     steps:
-      - name: 发送消息到飞书
+      - name: 发送打卡提醒卡片
         run: |
           curl -X POST \
             -H "Content-Type: application/json" \
             -d '{
-              "msg_type": "text",
-              "content": {
-                "text": "Hello from GitHub Actions！现在时间是 '"$(date +"%Y-%m-%d %H:%M:%S")"'"
+              "msg_type": "interactive",
+              "card": {
+                "config": {
+                  "wide_screen_mode": false
+                },
+                "header": {
+                  "title": {
+                    "tag": "plain_text",
+                    "content": "⏰ 上班打卡提醒"
+                  },
+                  "template": "orange"
+                },
+                "elements": [
+                  {
+                    "tag": "div",
+                    "text": {
+                      "tag": "lark_md",
+                      "content": "**现在是 8:25，该打卡上班了！**\n\n请记得及时打卡，避免迟到~"
+                    }
+                  },
+                  {
+                    "tag": "hr"
+                  },
+                  {
+                    "tag": "div",
+                    "text": {
+                      "tag": "lark_md",
+                      "content": "📋 **今日待办**\n- ✅ 完成打卡\n- 📝 查看今日日程\n- 💬 回复未读消息"
+                    }
+                  },
+                  {
+                    "tag": "hr"
+                  },
+                  {
+                    "tag": "note",
+                    "elements": [
+                      {
+                        "tag": "plain_text",
+                        "content": "新的一天，加油！💪"
+                      }
+                    ]
+                  }
+                ]
               }
             }' \
             ${{ secrets.FEISHU_URL }}
