@@ -24,7 +24,7 @@ jobs:
                     "tag": "plain_text",
                     "content": "🔧 SMT备料检查提醒"
                   },
-                  "template": "orange"
+                  "template": "blue"
                 },
                 "elements": [
                   {
