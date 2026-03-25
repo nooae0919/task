@@ -2,7 +2,7 @@ name: 定时发送飞书消息
 
 on:
   schedule:
-    - cron: '0 9 * * *'  # 每天上午9点执行（UTC时间，实际是北京时间17点，根据需求修改）
+    - cron: '0 1 * * *'  # 每天北京时间9点
   workflow_dispatch:      # 支持手动触发
 
 jobs:
@@ -10,15 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 发送消息到飞书
-        env:
-          WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
         run: |
           curl -X POST \
             -H "Content-Type: application/json" \
             -d '{
               "msg_type": "text",
               "content": {
-                "text": "定时消息：现在是北京时间'$(date +"%Y-%m-%d %H:%M:%S")'"
+                "text": "Hello from GitHub Actions！现在时间是 '"$(date +"%Y-%m-%d %H:%M:%S")"'"
               }
             }' \
-            $WEBHOOK
+            ${{ secrets.FEISHU_URL }}
