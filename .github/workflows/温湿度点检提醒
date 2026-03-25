@@ -1,0 +1,54 @@
+name: 温湿度点检提醒
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # 每天北京时间 10:00（UTC 2:00）
+    - cron: '0 7 * * *'   # 每天北京时间 15:00（UTC 7:00）
+  workflow_dispatch:
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 发送温湿度点检提醒卡片
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
+              "msg_type": "interactive",
+              "card": {
+                "config": {
+                  "wide_screen_mode": false
+                },
+                "header": {
+                  "title": {
+                    "tag": "plain_text",
+                    "content": "🌡️ 温湿度点检提醒"
+                  },
+                  "template": "blue"
+                },
+                "elements": [
+                  {
+                    "tag": "div",
+                    "text": {
+                      "tag": "lark_md",
+                      "content": "**请进行温湿度点检**\n\n🌡️ 温度标准：18-28℃\n💧 湿度标准：40-65%RH"
+                    }
+                  },
+                  {
+                    "tag": "hr"
+                  },
+
+                  {
+                    "tag": "note",
+                    "elements": [
+                      {
+                        "tag": "plain_text",
+                        "content": "每日两次：10:00 / 15:00 | 异常请及时上报处理"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }' \
+            ${{ secrets.FEISHU_URL }}
