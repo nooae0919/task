@@ -1,0 +1,62 @@
+name: 下班打卡提醒
+
+on:
+  schedule:
+    - cron: '25 12 * * *'  # 每天北京时间 20:25（UTC 12:25）
+  workflow_dispatch:
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 发送下班打卡提醒卡片
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
+              "msg_type": "interactive",
+              "card": {
+                "config": {
+                  "wide_screen_mode": false
+                },
+                "header": {
+                  "title": {
+                    "tag": "plain_text",
+                    "content": "🏠 下班打卡提醒"
+                  },
+                  "template": "green"
+                },
+                "elements": [
+                  {
+                    "tag": "div",
+                    "text": {
+                      "tag": "lark_md",
+                      "content": "**现在是 20:25，该打卡下班了！**\n\n辛苦一天了，记得打卡再走哦~"
+                    }
+                  },
+                  {
+                    "tag": "hr"
+                  },
+                  {
+                    "tag": "div",
+                    "text": {
+                      "tag": "lark_md",
+                      "content": "📋 **今日总结**\n- ✅ 完成今日任务\n- 📝 整理工作日志\n- 🏃 明天继续加油"
+                    }
+                  },
+                  {
+                    "tag": "hr"
+                  },
+                  {
+                    "tag": "note",
+                    "elements": [
+                      {
+                        "tag": "plain_text",
+                        "content": "早点休息，明天见！🌙"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }' \
+            ${{ secrets.FEISHU_URL }}
