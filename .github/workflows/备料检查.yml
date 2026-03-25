@@ -1,0 +1,83 @@
+name: SMT备料检查提醒
+
+on:
+  schedule:
+    - cron: '0 1 * * *'  # 每天北京时间 9:00（UTC 1:00）
+  workflow_dispatch:
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 发送SMT备料检查提醒卡片
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
+              "msg_type": "interactive",
+              "card": {
+                "config": {
+                  "wide_screen_mode": false
+                },
+                "header": {
+                  "title": {
+                    "tag": "plain_text",
+                    "content": "🔧 SMT备料检查提醒"
+                  },
+                  "template": "orange"
+                },
+                "elements": [
+                  {
+                    "tag": "div",
+                    "text": {
+                      "tag": "lark_md",
+                      "content": "**📋 今日SMT备料检查清单**\n\n请按照以下项目逐项检查，确保物料管理规范："
+                    }
+                  },
+                  {
+                    "tag": "hr"
+                  },
+                  {
+                    "tag": "div",
+                    "text": {
+                      "tag": "lark_md",
+                      "content": "**1️⃣ 调拨收货核对**\n- 导出调拨清单\n- 检查接收数量与调拨数量是否一致\n- 发现差异需及时处理"
+                    }
+                  },
+                  {
+                    "tag": "div",
+                    "text": {
+                      "tag": "lark_md",
+                      "content": "**2️⃣ 物料上架检查**\n- 导出库存清单\n- 检查是否有空库位\n- 空库位需及时补货或调整"
+                    }
+                  },
+                  {
+                    "tag": "div",
+                    "text": {
+                      "tag": "lark_md",
+                      "content": "**3️⃣ 备料关联库位检查**\n- 导出库存清单\n- 检查是否有空库位\n- 确保备料与库位正确关联"
+                    }
+                  },
+                  {
+                    "tag": "div",
+                    "text": {
+                      "tag": "lark_md",
+                      "content": "**4️⃣ 生产领料拣货检查**\n- 按库位导出库存清单\n- 检查是否有在库物料\n- 确认拣货后无遗漏物料"
+                    }
+                  },
+                  {
+                    "tag": "hr"
+                  },
+                                    {
+                    "tag": "note",
+                    "elements": [
+                      {
+                        "tag": "plain_text",
+                        "content": "⏰ 检查时间：每次备料和收货后 | 如有异常请及时上报"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }' \
+            ${{ secrets.FEISHU_URL }}
